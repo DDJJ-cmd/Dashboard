@@ -1,0 +1,508 @@
+import { useState, useMemo } from "react";
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ComposedChart, Area, ReferenceLine } from "recharts";
+
+const RAW={"ht":[{"h":"GNA","fg":1769505114,"fp":550943238,"pg":1765116463,"pp":544774969,"bg":1739189154,"bp":524403781,"lg":1749809526,"lp":550169882,"gm":31.1,"oc":85.5,"ad":9404,"rp":8040,"poc":85.6,"pad":9374,"prp":8020,"boc":84.5,"bad":9416,"brp":7952,"loc":87.7,"lad":9134,"lrp":8015,"co":126515182,"la":251445352,"oe":463414514,"na":377186828},{"h":"HFS","fg":12121018107,"fp":4892737676,"pg":12121018107,"pp":4892737676,"bg":12071615202,"bp":4849856336,"lg":11629442372,"lp":4749015957,"gm":40.4,"oc":69.9,"ad":26222,"rp":18340,"poc":69.9,"pad":26222,"prp":18340,"boc":69.7,"bad":26156,"brp":18231,"loc":66.0,"lad":26095,"lrp":17220,"co":828349502,"la":1984889272,"oe":1825123441,"na":2589918215},{"h":"HIO","fg":2552575613,"fp":1602615063,"pg":2571999938,"pp":1629501545,"bg":2574127658,"bp":1612975459,"lg":2524195659,"lp":1636387820,"gm":62.8,"oc":94.1,"ad":22962,"rp":21611,"poc":94.0,"pad":23178,"prp":21782,"boc":93.6,"bad":23281,"brp":21797,"loc":95.1,"lad":22433,"lrp":21334,"co":7920673,"la":59241888,"oe":566539861,"na":316258128},{"h":"HLN","fg":3600668992,"fp":1000463324,"pg":3617354363,"pp":994900135,"bg":3599615419,"bp":973793351,"lg":3477075598,"lp":891317193,"gm":27.8,"oc":86.7,"ad":14138,"rp":12254,"poc":87.1,"pad":14116,"prp":12291,"boc":87.1,"bad":14033,"brp":12228,"loc":89.1,"lad":13321,"lrp":11872,"co":275623987,"la":675390806,"oe":738206512,"na":910984363},{"h":"HNA","fg":6853242746,"fp":2532229630,"pg":6840382746,"pp":2521399630,"bg":6855701000,"bp":2546546000,"lg":6356008496,"lp":2296344194,"gm":36.9,"oc":85.1,"ad":37997,"rp":32329,"poc":84.8,"pad":38062,"prp":32294,"boc":84.9,"bad":38231,"brp":32443,"loc":83.2,"lad":35320,"lrp":29397,"co":656243514,"la":1089123214,"oe":1276846212,"na":1298800176},{"h":"HNN","fg":3086003532,"fp":732045491,"pg":3079177922,"pp":727087189,"bg":3047854200,"bp":708381771,"lg":2853686255,"lp":628157994,"gm":23.7,"oc":74.7,"ad":16323,"rp":12192,"poc":74.6,"pad":16310,"prp":12164,"boc":74.6,"bad":16220,"brp":12098,"loc":72.5,"lad":15947,"lrp":11556,"co":501333095,"la":712870735,"oe":449910323,"na":689843888},{"h":"JKY","fg":880839798,"fp":329616062,"pg":883594822,"pp":334603632,"bg":898311889,"bp":353868858,"lg":887720370,"lp":289306823,"gm":37.4,"oc":88.4,"ad":13997,"rp":12368,"poc":88.7,"pad":13976,"prp":12403,"boc":89.2,"bad":14166,"brp":12632,"loc":89.9,"lad":13430,"lrp":12069,"co":35883510,"la":86351915,"oe":216925084,"na":212063227},{"h":"MOH","fg":6396374929,"fp":1671678597,"pg":6406069022,"pp":1674278728,"bg":6402135920,"bp":1672536157,"lg":6146997918,"lp":1440123137,"gm":26.1,"oc":88.5,"ad":26201,"rp":23175,"poc":88.7,"pad":26204,"prp":23253,"boc":88.8,"bad":26309,"brp":23356,"loc":82.8,"lad":26494,"lrp":21936,"co":1448685570,"la":837927776,"oe":1061788895,"na":1376294091},{"h":"NOH","fg":3617394301,"fp":2039288331,"pg":3616827637,"pp":2037437804,"bg":3678888675,"bp":2043209643,"lg":3226043619,"lp":1833888840,"gm":56.4,"oc":92.8,"ad":29294,"rp":27186,"poc":93.1,"pad":29201,"prp":27200,"boc":93.1,"bad":29501,"brp":27466,"loc":92.1,"lad":27675,"lrp":25486,"co":96110993,"la":120944133,"oe":790625429,"na":570425415},{"h":"OHF","fg":4081410515,"fp":2278096434,"pg":4075104482,"pp":2282144273,"bg":4072558615,"bp":2273382803,"lg":3858940313,"lp":2147817189,"gm":55.8,"oc":95.0,"ad":27534,"rp":26153,"poc":95.0,"pad":27504,"prp":26118,"boc":94.9,"bad":27492,"brp":26080,"loc":95.9,"lad":25213,"lrp":24168,"co":348985950,"la":336562291,"oe":511903692,"na":605862148},{"h":"OHH","fg":1562263738,"fp":375222028,"pg":1560507386,"pp":373441722,"bg":1561070193,"bp":371627107,"lg":1429620210,"lp":294123270,"gm":24.0,"oc":86.5,"ad":12133,"rp":10491,"poc":86.5,"pad":12112,"prp":10479,"boc":87.2,"bad":12046,"brp":10504,"loc":85.1,"lad":11465,"lrp":9761,"co":203025563,"la":271653372,"oe":312641457,"na":399721318},{"h":"OHO","fg":6174503015,"fp":2208025649,"pg":6172418010,"pp":2213032533,"bg":6141326867,"bp":2197813253,"lg":5539386042,"lp":1851250180,"gm":35.8,"oc":85.2,"ad":39972,"rp":34076,"poc":85.3,"pad":39939,"prp":34067,"boc":84.9,"bad":40087,"brp":34023,"loc":83.2,"lad":36563,"lrp":30424,"co":495937733,"la":683853223,"oe":1510576331,"na":1276110079},{"h":"OHT","fg":8096778279,"fp":3094060801,"pg":8100551585,"pp":3094397781,"bg":8082632462,"bp":3092529722,"lg":7491842950,"lp":2808302532,"gm":38.2,"oc":94.1,"ad":31331,"rp":29481,"poc":94.0,"pad":31353,"prp":29482,"boc":94.1,"bad":31192,"brp":29341,"loc":86.0,"lad":30379,"lrp":26122,"co":998785558,"la":660108281,"oe":1845673420,"na":1498150219},{"h":"OHU","fg":4134746048,"fp":2061149808,"pg":4139851565,"pp":2068743943,"bg":4266840730,"bp":2178211895,"lg":3947500884,"lp":2025454211,"gm":49.8,"oc":94.5,"ad":31754,"rp":30002,"poc":94.4,"pad":31830,"prp":30041,"boc":94.6,"bad":32771,"brp":31004,"loc":91.4,"lad":31831,"lrp":29081,"co":180856165,"la":171461984,"oe":966955671,"na":754322420},{"h":"OKR","fg":1015665245,"fp":467893490,"pg":1014257903,"pp":466121630,"bg":1019519974,"bp":471231535,"lg":937101626,"lp":451965456,"gm":46.1,"oc":90.5,"ad":15965,"rp":14440,"poc":90.3,"pad":15981,"prp":14425,"boc":90.0,"bad":16147,"brp":14534,"loc":87.2,"lad":15369,"lrp":13406,"co":47399108,"la":67459165,"oe":265435707,"na":167477775},{"h":"SBO","fg":4223462946,"fp":1215035473,"pg":4228154135,"pp":1169779433,"bg":4268176769,"bp":1313917277,"lg":3726517711,"lp":881265119,"gm":28.8,"oc":79.6,"ad":21089,"rp":16779,"poc":79.6,"pad":21091,"prp":16791,"boc":80.1,"bad":21229,"brp":16999,"loc":78.2,"lad":18850,"lrp":14739,"co":459762936,"la":582299525,"oe":1065880035,"na":900484977},{"h":"SHH","fg":3816839561,"fp":1323747270,"pg":3816839561,"pp":1323747270,"bg":3715766741,"bp":1286740774,"lg":3754531856,"lp":1215872228,"gm":34.7,"oc":86.9,"ad":31369,"rp":27271,"poc":86.9,"pad":31369,"prp":27271,"boc":85.5,"bad":30987,"brp":26497,"loc":84.0,"lad":30312,"lrp":25449,"co":366660165,"la":813968637,"oe":430346546,"na":882116944},{"h":"XFN","fg":1064440835,"fp":600572631,"pg":1067941949,"pp":612026346,"bg":1063853991,"bp":601621780,"lg":964407021,"lp":562092810,"gm":56.4,"oc":93.0,"ad":15224,"rp":14163,"poc":93.3,"pad":15263,"prp":14235,"boc":93.5,"bad":15187,"brp":14197,"loc":92.2,"lad":14711,"lrp":13561,"co":43554671,"la":44041496,"oe":238713240,"na":137558797},{"h":"XFT","fg":1665803956,"fp":988754568,"pg":1670459158,"pp":1003036524,"bg":1680008659,"bp":999993355,"lg":1515886641,"lp":923627594,"gm":59.4,"oc":95.7,"ad":15943,"rp":15254,"poc":95.7,"pad":16009,"prp":15316,"boc":95.6,"bad":16155,"brp":15439,"loc":95.7,"lad":14986,"lrp":14339,"co":68729813,"la":61514971,"oe":359134671,"na":187669933},{"h":"XOS","fg":599255808,"fp":259709529,"pg":605275653,"pp":265642814,"bg":601866508,"bp":262292048,"lg":629350152,"lp":308640009,"gm":43.3,"oc":91.9,"ad":13207,"rp":12139,"poc":91.9,"pad":13334,"prp":12253,"boc":92.0,"bad":13254,"brp":12198,"loc":93.0,"lad":13875,"lrp":12900,"co":116728,"la":40564068,"oe":212780095,"na":86085388}],"mt":[{"m":"Jan","fg":5127403792,"fp":1641006262,"pg":5127403792,"pp":1641006262,"bg":5095209211,"bp":1645094802,"lg":5067354944,"lp":1752499362},{"m":"Feb","fg":5198612090,"fp":1723026923,"pg":5178816606,"pp":1683864693,"bg":5128119627,"bp":1658656093,"lg":4919956433,"lp":1650925137},{"m":"Mar","fg":6245205935,"fp":2410930937,"pg":6268081094,"pp":2434941264,"bg":6298916923,"bp":2475751551,"lg":5776212437,"lp":2182135927},{"m":"Apr","fg":6192950364,"fp":2385251309,"pg":6229967636,"pp":2409954608,"bg":6299337253,"bp":2468984595,"lg":5995184480,"lp":2301192978},{"m":"May","fg":6513749492,"fp":2577704811,"pg":6516867070,"pp":2592081911,"bg":6513077243,"bp":2587750998,"lg":5961456687,"lp":2283717959},{"m":"Jun","fg":5778277172,"fp":2001558271,"pg":5780021758,"pp":2000939001,"bg":5778064503,"bp":2013973071,"lg":5393416782,"lp":1728317761},{"m":"Jul","fg":6578276892,"fp":2537857925,"pg":6580754982,"pp":2538763233,"bg":6593559931,"bp":2559357047,"lg":5893773618,"lp":2199472248},{"m":"Aug","fg":7639283381,"fp":3360108919,"pg":7633818261,"pp":3353801724,"bg":7633080338,"bp":3354019829,"lg":7137448325,"lp":3106476012},{"m":"Sep","fg":6420580089,"fp":2420752619,"pg":6420115099,"pp":2417174118,"bg":6419841726,"bp":2417023089,"lg":5928400853,"lp":2152327780},{"m":"Oct","fg":7247626893,"fp":3090259517,"pg":7247159524,"pp":3086712147,"bg":7223918676,"bp":3080846850,"lg":6931610951,"lp":2938719701},{"m":"Nov","fg":7287041624,"fp":3127979374,"pg":7286576494,"pp":3124793910,"bg":7273397077,"bp":3126491377,"lg":7011125162,"lp":3013622735},{"m":"Dec","fg":7083785352,"fp":2947448226,"pg":7083320089,"pp":2944802707,"bg":7084538119,"bp":2946983604,"lg":6630124547,"lp":2475714838}]};
+
+const B=1e9, M=1e6;
+const fB=(v)=>`¥${(v/B).toFixed(1)}B`;
+const fM=(v)=>{const a=Math.abs(v/M);return `${v>=0?'+':'−'}¥${a.toFixed(0)}M`;};
+const fP=(v)=>`${v>=0?'+':''}${v.toFixed(1)}%`;
+const fK=(v)=>`¥${(v/1000).toFixed(1)}K`;
+
+const C={
+  bg:'#0b0f1a', card:'#111827', border:'#1e293b', accent:'#3b82f6',
+  green:'#10b981', red:'#ef4444', amber:'#f59e0b', purple:'#8b5cf6',
+  cyan:'#06b6d4', pink:'#ec4899', orange:'#f97316',
+  t1:'#f1f5f9', t2:'#94a3b8', t3:'#64748b', grid:'#1e293b',
+  prevFC:'#a78bfa', // distinct color for Previous FC
+};
+
+const TT=({active,payload,label})=>{
+  if(!active||!payload)return null;
+  return(<div style={{background:'#1e293b',border:'1px solid #334155',borderRadius:8,padding:'10px 14px',fontSize:11,maxWidth:280}}>
+    <div style={{color:'#f1f5f9',fontWeight:700,marginBottom:6}}>{label}</div>
+    {payload.map((p,i)=>(<div key={i} style={{color:p.color||'#94a3b8',marginBottom:2}}>
+      {p.name}: ¥{(p.value/B).toFixed(2)}B
+    </div>))}
+  </div>);
+};
+
+const Card=({label,value,sub,items,color=C.accent})=>(
+  <div style={{background:`linear-gradient(135deg,${C.card} 0%,${C.bg} 100%)`,border:`1px solid ${C.border}`,borderRadius:12,padding:'18px 20px',position:'relative',overflow:'hidden'}}>
+    <div style={{position:'absolute',top:0,left:0,width:4,height:'100%',background:color,borderRadius:'12px 0 0 12px'}}/>
+    <div style={{color:C.t3,fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:1.2,marginBottom:6}}>{label}</div>
+    <div style={{color:C.t1,fontSize:24,fontWeight:700,letterSpacing:-0.5,fontFamily:"'DM Sans',sans-serif"}}>{value}</div>
+    {sub&&<div style={{color:C.t3,fontSize:10,marginTop:3}}>{sub}</div>}
+    {items&&<div style={{marginTop:8,display:'flex',flexDirection:'column',gap:3}}>
+      {items.map((it,i)=>(<div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:11}}>
+        <span style={{color:C.t3}}>{it.label}</span>
+        <span style={{color:it.val>=0?C.green:C.red,fontWeight:600}}>{fP(it.val)}</span>
+      </div>))}
+    </div>}
+  </div>
+);
+
+const Sec=({children,icon})=>(
+  <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14,marginTop:28}}>
+    {icon&&<span style={{fontSize:16}}>{icon}</span>}
+    <h2 style={{color:C.t1,fontSize:15,fontWeight:700,margin:0,fontFamily:"'DM Sans',sans-serif",letterSpacing:-0.3}}>{children}</h2>
+    <div style={{flex:1,height:1,background:C.border}}/>
+  </div>
+);
+
+const Badge=({val,suffix='%'})=>(
+  <span style={{display:'inline-block',padding:'2px 7px',borderRadius:4,fontSize:10,fontWeight:700,
+    background:val>=0?'rgba(16,185,129,0.15)':'rgba(239,68,68,0.15)',
+    color:val>=0?C.green:C.red}}>{val>=0?'+':''}{val.toFixed(1)}{suffix}</span>
+);
+
+export default function Dashboard(){
+  const [tab,setTab]=useState('overview');
+  const [sortKey,setSortKey]=useState('fg');
+  const [sortAsc,setSortAsc]=useState(false);
+  const [rankMetric,setRankMetric]=useState('fg');
+
+  const hotels=RAW.ht;
+  const monthly=RAW.mt;
+
+  const tot=useMemo(()=>{
+    const t={fg:0,fp:0,pg:0,pp:0,bg:0,bp:0,lg:0,lp:0};
+    hotels.forEach(h=>{t.fg+=h.fg;t.fp+=h.fp;t.pg+=h.pg;t.pp+=h.pp;t.bg+=h.bg;t.bp+=h.bp;t.lg+=h.lg;t.lp+=h.lp;});
+    return t;
+  },[hotels]);
+
+  const pcts=useMemo(()=>({
+    vPG:(tot.fg/tot.pg-1)*100, vPP:(tot.fp/tot.pp-1)*100,
+    vBG:(tot.fg/tot.bg-1)*100, vBP:(tot.fp/tot.bp-1)*100,
+    vLG:(tot.fg/tot.lg-1)*100, vLP:(tot.fp/tot.lp-1)*100,
+    gm:tot.fp/tot.fg*100,
+  }),[tot]);
+
+  const sortedH=useMemo(()=>[...hotels].sort((a,b)=>sortAsc?a[sortKey]-b[sortKey]:b[sortKey]-a[sortKey]),[hotels,sortKey,sortAsc]);
+
+  const rankLabels={fg:'GOR',fp:'GOP',gm:'GOP Margin %',oc:'Occupancy %',ad:'ADR',rp:'RevPAR'};
+  const rankedH=useMemo(()=>[...hotels].sort((a,b)=>b[rankMetric]-a[rankMetric]),[hotels,rankMetric]);
+
+  const monthlyChart=useMemo(()=>monthly.map(m=>({
+    month:m.m,
+    'FC':m.fg/B,'Prev FC':m.pg/B,'Budget':m.bg/B,'LY':m.lg/B,
+    'FC GOP':m.fp/B,'Prev FC GOP':m.pp/B,'BUD GOP':m.bp/B,'LY GOP':m.lp/B,
+    'GOP%':m.fp/m.fg*100,
+  })),[monthly]);
+
+  const tabs=[
+    {key:'overview',label:'Overview'},
+    {key:'ranking',label:'Ranking'},
+    {key:'monthly',label:'Monthly'},
+    {key:'variance',label:'Variance'},
+    {key:'kpi',label:'KPI'},
+    {key:'table',label:'Table'},
+  ];
+
+  const handleSort=(k)=>{if(sortKey===k)setSortAsc(!sortAsc);else{setSortKey(k);setSortAsc(false);}};
+
+  const ThC=({k,children,left})=>(
+    <th onClick={()=>handleSort(k)} style={{padding:'9px 10px',textAlign:left?'left':'right',cursor:'pointer',fontSize:9.5,fontWeight:700,
+      color:sortKey===k?C.accent:C.t3,textTransform:'uppercase',letterSpacing:0.7,whiteSpace:'nowrap',
+      borderBottom:`1px solid ${C.border}`,userSelect:'none',position:left?'sticky':'static',left:left?0:'auto',
+      background:left?'#0f172a':'transparent',zIndex:left?2:0}}>
+      {children}{sortKey===k?(sortAsc?' ↑':' ↓'):''}
+    </th>
+  );
+
+  const pctCell=(fc,base)=>{
+    if(!base)return <td style={{padding:'8px 10px',textAlign:'right',color:C.t3,fontSize:11}}>—</td>;
+    const v=(fc/base-1)*100;
+    return <td style={{padding:'8px 10px',textAlign:'right',fontSize:11}}><Badge val={v}/></td>;
+  };
+
+  return(
+    <div style={{background:C.bg,minHeight:'100vh',padding:'22px 26px',fontFamily:"'DM Sans',-apple-system,sans-serif",color:C.t1}}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+      {/* Header */}
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:24,flexWrap:'wrap',gap:12}}>
+        <div>
+          <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:4}}>
+            <div style={{width:7,height:7,borderRadius:'50%',background:C.green,boxShadow:`0 0 8px ${C.green}`}}/>
+            <span style={{color:C.t3,fontSize:10,fontWeight:600,letterSpacing:1.5,textTransform:'uppercase'}}>Live Dashboard</span>
+          </div>
+          <h1 style={{fontSize:24,fontWeight:800,margin:0,letterSpacing:-0.5,background:'linear-gradient(135deg,#f1f5f9,#94a3b8)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+            FY2026 PL Forecast Dashboard（改）
+          </h1>
+          <div style={{color:C.t3,fontSize:11,marginTop:3}}>HMJ Portfolio · 20 Hotels · Updated 2026-02-24 · 社外秘</div>
+        </div>
+        <div style={{display:'flex',gap:4,padding:3,background:C.card,borderRadius:10,border:`1px solid ${C.border}`,flexWrap:'wrap'}}>
+          {tabs.map(t=>(
+            <button key={t.key} onClick={()=>setTab(t.key)} style={{
+              padding:'7px 14px',borderRadius:7,border:'none',cursor:'pointer',fontSize:11,fontWeight:600,
+              background:tab===t.key?C.accent:'transparent',color:tab===t.key?'#fff':C.t3,transition:'all 0.2s',
+            }}>{t.label}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* KPI Summary Cards */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:14,marginBottom:8}}>
+        <Card label="Total GOR" value={fB(tot.fg)} sub="20 Hotels Annualized" color={C.accent}
+          items={[{label:'vs Prev FC',val:pcts.vPG},{label:'vs Budget',val:pcts.vBG},{label:'vs LY',val:pcts.vLG}]}/>
+        <Card label="Total GOP" value={fB(tot.fp)} sub={`GOP Margin: ${pcts.gm.toFixed(1)}%`} color={C.green}
+          items={[{label:'vs Prev FC',val:pcts.vPP},{label:'vs Budget',val:pcts.vBP},{label:'vs LY',val:pcts.vLP}]}/>
+        <Card label="GOR Diff vs Prev FC" value={fM(tot.fg-tot.pg)} color={C.prevFC}
+          items={[{label:'vs Budget',val:pcts.vBG},{label:'vs LY',val:pcts.vLG}]}/>
+        <Card label="GOP Diff vs Prev FC" value={fM(tot.fp-tot.pp)} color={C.purple}
+          items={[{label:'vs Budget',val:pcts.vBP},{label:'vs LY',val:pcts.vLP}]}/>
+        <Card label="YoY Growth" value={`+${pcts.vLG.toFixed(1)}%`} sub={`GOP +${pcts.vLP.toFixed(1)}%`} color={C.cyan}
+          items={[{label:'GOR Δ',val:pcts.vLG},{label:'GOP Δ',val:pcts.vLP}]}/>
+      </div>
+
+      {/* ===== OVERVIEW ===== */}
+      {tab==='overview'&&(<>
+        <Sec icon="📊">GOR by Hotel — FC vs Prev FC vs Budget vs LY</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={480}>
+            <BarChart data={[...hotels].sort((a,b)=>b.fg-a.fg)} layout="vertical" margin={{left:8,right:20,top:8,bottom:8}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false}/>
+              <XAxis type="number" tickFormatter={v=>`${(v/B).toFixed(0)}B`} tick={{fill:C.t3,fontSize:10}}/>
+              <YAxis dataKey="h" type="category" width={36} tick={{fill:C.t2,fontSize:10,fontWeight:700}}/>
+              <Tooltip content={<TT/>}/>
+              <Legend wrapperStyle={{fontSize:10}}/>
+              <Bar dataKey="fg" name="FC" fill={C.accent} radius={[0,3,3,0]} barSize={8}/>
+              <Bar dataKey="pg" name="Prev FC" fill={C.prevFC} radius={[0,3,3,0]} barSize={8} opacity={0.7}/>
+              <Bar dataKey="bg" name="Budget" fill={C.amber} radius={[0,3,3,0]} barSize={8} opacity={0.5}/>
+              <Bar dataKey="lg" name="LY" fill={C.t3} radius={[0,3,3,0]} barSize={8} opacity={0.35}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <Sec icon="💰">GOP Margin Ranking</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={480}>
+            <BarChart data={[...hotels].sort((a,b)=>b.gm-a.gm)} layout="vertical" margin={{left:8,right:30,top:8,bottom:8}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false}/>
+              <XAxis type="number" domain={[0,70]} tickFormatter={v=>`${v}%`} tick={{fill:C.t3,fontSize:10}}/>
+              <YAxis dataKey="h" type="category" width={36} tick={{fill:C.t2,fontSize:10,fontWeight:700}}/>
+              <Tooltip formatter={v=>`${v.toFixed(1)}%`} contentStyle={{background:'#1e293b',border:'1px solid #334155',borderRadius:8,fontSize:11}}/>
+              <ReferenceLine x={pcts.gm} stroke={C.red} strokeDasharray="4 4" label={{value:`Avg ${pcts.gm.toFixed(1)}%`,fill:C.red,fontSize:9}}/>
+              <Bar dataKey="gm" name="GOP%" radius={[0,5,5,0]} barSize={13}>
+                {[...hotels].sort((a,b)=>b.gm-a.gm).map((e,i)=><Cell key={i} fill={e.gm>=pcts.gm?C.green:C.amber}/>)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <Sec icon="🏗">Cost Structure by Hotel (% of GOR)</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={480}>
+            <BarChart data={[...hotels].sort((a,b)=>b.fg-a.fg).map(h=>({
+              h:h.h,'原価':h.co/h.fg*100,'人件費':h.la/h.fg*100,'その他':h.oe/h.fg*100,'非配賦':h.na/h.fg*100,'GOP':h.gm
+            }))} layout="vertical" margin={{left:8,right:20,top:8,bottom:8}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false}/>
+              <XAxis type="number" domain={[0,100]} tickFormatter={v=>`${v}%`} tick={{fill:C.t3,fontSize:10}}/>
+              <YAxis dataKey="h" type="category" width={36} tick={{fill:C.t2,fontSize:10,fontWeight:700}}/>
+              <Tooltip formatter={v=>`${v.toFixed(1)}%`} contentStyle={{background:'#1e293b',border:'1px solid #334155',borderRadius:8,fontSize:11}}/>
+              <Legend wrapperStyle={{fontSize:10}}/>
+              <Bar dataKey="原価" stackId="a" fill="#ef4444" barSize={13}/>
+              <Bar dataKey="人件費" stackId="a" fill="#f59e0b" barSize={13}/>
+              <Bar dataKey="その他" stackId="a" fill="#8b5cf6" barSize={13}/>
+              <Bar dataKey="非配賦" stackId="a" fill="#64748b" barSize={13}/>
+              <Bar dataKey="GOP" stackId="a" fill="#10b981" barSize={13}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </>)}
+
+      {/* ===== RANKING ===== */}
+      {tab==='ranking'&&(<>
+        <Sec icon="🏆">全ホテル Ranking</Sec>
+        <div style={{display:'flex',gap:6,marginBottom:16,flexWrap:'wrap'}}>
+          {Object.entries(rankLabels).map(([k,v])=>(
+            <button key={k} onClick={()=>setRankMetric(k)} style={{
+              padding:'6px 14px',borderRadius:20,border:`1px solid ${rankMetric===k?C.accent:C.border}`,cursor:'pointer',
+              fontSize:11,fontWeight:600,background:rankMetric===k?C.accent:'transparent',
+              color:rankMetric===k?'#fff':C.t2,transition:'all 0.2s',
+            }}>{v}</button>
+          ))}
+        </div>
+
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={520}>
+            <BarChart data={rankedH.map((h,i)=>({...h,rank:i+1}))} layout="vertical" margin={{left:8,right:20,top:8,bottom:8}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false}/>
+              <XAxis type="number" tickFormatter={v=>rankMetric==='fg'||rankMetric==='fp'?`${(v/B).toFixed(0)}B`:rankMetric==='ad'||rankMetric==='rp'?fK(v):`${v}`} tick={{fill:C.t3,fontSize:10}}/>
+              <YAxis dataKey="h" type="category" width={36} tick={{fill:C.t2,fontSize:10,fontWeight:700}}/>
+              <Tooltip formatter={v=>rankMetric==='fg'||rankMetric==='fp'?`¥${(v/B).toFixed(2)}B`:rankMetric==='ad'||rankMetric==='rp'?`¥${v.toLocaleString()}`:`${v.toFixed(1)}%`}
+                contentStyle={{background:'#1e293b',border:'1px solid #334155',borderRadius:8,fontSize:11}}/>
+              <Bar dataKey={rankMetric} name={rankLabels[rankMetric]} radius={[0,6,6,0]} barSize={15}>
+                {rankedH.map((_,i)=>{
+                  const colors=[C.accent,C.green,C.cyan,C.purple,C.amber,C.pink,C.orange,'#22d3ee'];
+                  return <Cell key={i} fill={i<3?'#fbbf24':colors[i%colors.length]} opacity={i<3?1:0.75}/>;
+                })}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Comparison Table */}
+        <Sec icon="📋">全ホテル {rankLabels[rankMetric]} 比較表</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,overflow:'auto'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:11}}>
+            <thead><tr style={{background:'#0f172a'}}>
+              <th style={{padding:'9px 12px',textAlign:'center',color:C.amber,fontSize:10,fontWeight:700,borderBottom:`1px solid ${C.border}`,width:30}}>#</th>
+              <th style={{padding:'9px 12px',textAlign:'left',color:C.t2,fontSize:10,fontWeight:700,borderBottom:`1px solid ${C.border}`}}>Hotel</th>
+              <th style={{padding:'9px 12px',textAlign:'right',color:C.t2,fontSize:10,fontWeight:700,borderBottom:`1px solid ${C.border}`}}>FC</th>
+              <th style={{padding:'9px 12px',textAlign:'right',color:C.prevFC,fontSize:10,fontWeight:700,borderBottom:`1px solid ${C.border}`}}>vs Prev FC</th>
+              <th style={{padding:'9px 12px',textAlign:'right',color:C.amber,fontSize:10,fontWeight:700,borderBottom:`1px solid ${C.border}`}}>vs Budget</th>
+              <th style={{padding:'9px 12px',textAlign:'right',color:C.cyan,fontSize:10,fontWeight:700,borderBottom:`1px solid ${C.border}`}}>vs LY</th>
+            </tr></thead>
+            <tbody>
+              {rankedH.map((h,i)=>{
+                const fc=h[rankMetric];
+                const pv=rankMetric==='fg'?h.pg:rankMetric==='fp'?h.pp:rankMetric==='oc'?h.poc:rankMetric==='ad'?h.pad:rankMetric==='rp'?h.prp:h.gm;
+                const bu=rankMetric==='fg'?h.bg:rankMetric==='fp'?h.bp:rankMetric==='oc'?h.boc:rankMetric==='ad'?h.bad:rankMetric==='rp'?h.brp:h.gm;
+                const ly=rankMetric==='fg'?h.lg:rankMetric==='fp'?h.lp:rankMetric==='oc'?h.loc:rankMetric==='ad'?h.lad:rankMetric==='rp'?h.lrp:h.gm;
+                const fmt=rankMetric==='fg'||rankMetric==='fp'?v=>fB(v):rankMetric==='ad'||rankMetric==='rp'?v=>`¥${v.toLocaleString()}`:v=>`${v.toFixed(1)}%`;
+                const diffType=rankMetric==='oc'||rankMetric==='gm'?'pt':'pct';
+                const diffFn=(a,b)=>diffType==='pt'?a-b:(a/b-1)*100;
+                return(
+                  <tr key={h.h} style={{background:i%2===0?'transparent':'rgba(255,255,255,0.015)',borderBottom:`1px solid ${C.border}`}}>
+                    <td style={{padding:'8px 12px',textAlign:'center',color:i<3?C.amber:C.t3,fontWeight:800,fontSize:12}}>{i+1}</td>
+                    <td style={{padding:'8px 12px',fontWeight:700,color:C.t1}}>{h.h}</td>
+                    <td style={{padding:'8px 12px',textAlign:'right',color:C.t1,fontFamily:'monospace',fontSize:11}}>{fmt(fc)}</td>
+                    <td style={{padding:'8px 12px',textAlign:'right'}}>{pv?<Badge val={diffFn(fc,pv)} suffix={diffType==='pt'?'pt':'%'}/>:'—'}</td>
+                    <td style={{padding:'8px 12px',textAlign:'right'}}>{bu?<Badge val={diffFn(fc,bu)} suffix={diffType==='pt'?'pt':'%'}/>:'—'}</td>
+                    <td style={{padding:'8px 12px',textAlign:'right'}}>{ly?<Badge val={diffFn(fc,ly)} suffix={diffType==='pt'?'pt':'%'}/>:'—'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </>)}
+
+      {/* ===== MONTHLY ===== */}
+      {tab==='monthly'&&(<>
+        <Sec icon="📈">Monthly GOR — FC vs Prev FC vs Budget vs LY</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={340}>
+            <ComposedChart data={monthlyChart} margin={{left:10,right:10,top:10,bottom:10}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid}/>
+              <XAxis dataKey="month" tick={{fill:C.t2,fontSize:11}}/>
+              <YAxis tickFormatter={v=>`${v.toFixed(0)}B`} tick={{fill:C.t3,fontSize:10}}/>
+              <Tooltip content={<TT/>}/>
+              <Legend wrapperStyle={{fontSize:10}}/>
+              <Area type="monotone" dataKey="LY" fill={C.t3} fillOpacity={0.08} stroke={C.t3} strokeWidth={1} strokeDasharray="4 4"/>
+              <Line type="monotone" dataKey="Budget" stroke={C.amber} strokeWidth={2} strokeDasharray="6 3" dot={false}/>
+              <Line type="monotone" dataKey="Prev FC" stroke={C.prevFC} strokeWidth={2} strokeDasharray="3 3" dot={{r:3,fill:C.prevFC}}/>
+              <Line type="monotone" dataKey="FC" stroke={C.accent} strokeWidth={3} dot={{r:4,fill:C.accent}} activeDot={{r:6}}/>
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+
+        <Sec icon="📈">Monthly GOP — FC vs Prev FC vs Budget vs LY</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={340}>
+            <ComposedChart data={monthlyChart} margin={{left:10,right:10,top:10,bottom:10}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid}/>
+              <XAxis dataKey="month" tick={{fill:C.t2,fontSize:11}}/>
+              <YAxis yAxisId="l" tickFormatter={v=>`${v.toFixed(0)}B`} tick={{fill:C.t3,fontSize:10}}/>
+              <YAxis yAxisId="r" orientation="right" tickFormatter={v=>`${v.toFixed(0)}%`} tick={{fill:C.t3,fontSize:10}} domain={[25,50]}/>
+              <Tooltip content={<TT/>}/>
+              <Legend wrapperStyle={{fontSize:10}}/>
+              <Area yAxisId="l" type="monotone" dataKey="LY GOP" fill={C.t3} fillOpacity={0.08} stroke={C.t3} strokeWidth={1} strokeDasharray="4 4"/>
+              <Line yAxisId="l" type="monotone" dataKey="BUD GOP" stroke={C.amber} strokeWidth={2} strokeDasharray="6 3" dot={false}/>
+              <Line yAxisId="l" type="monotone" dataKey="Prev FC GOP" stroke={C.prevFC} strokeWidth={2} strokeDasharray="3 3" dot={{r:3,fill:C.prevFC}}/>
+              <Line yAxisId="l" type="monotone" dataKey="FC GOP" stroke={C.green} strokeWidth={3} dot={{r:4,fill:C.green}} activeDot={{r:6}}/>
+              <Line yAxisId="r" type="monotone" dataKey="GOP%" stroke={C.pink} strokeWidth={2} dot={{r:3,fill:C.pink}}/>
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+
+        <Sec icon="📊">Monthly GOR vs Budget & vs Prev FC (%)</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={monthlyChart.map(m=>({
+              month:m.month,
+              'vs Prev FC%':((m['FC']/m['Prev FC'])-1)*100,
+              'vs Budget%':((m['FC']/m['Budget'])-1)*100,
+              'vs LY%':((m['FC']/m['LY'])-1)*100,
+            }))} margin={{left:10,right:10,top:10,bottom:10}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid}/>
+              <XAxis dataKey="month" tick={{fill:C.t2,fontSize:11}}/>
+              <YAxis tickFormatter={v=>`${v.toFixed(1)}%`} tick={{fill:C.t3,fontSize:10}}/>
+              <Tooltip formatter={v=>`${v.toFixed(2)}%`} contentStyle={{background:'#1e293b',border:'1px solid #334155',borderRadius:8,fontSize:11}}/>
+              <Legend wrapperStyle={{fontSize:10}}/>
+              <ReferenceLine y={0} stroke={C.t3}/>
+              <Bar dataKey="vs Prev FC%" fill={C.prevFC} radius={[3,3,0,0]} barSize={14}/>
+              <Bar dataKey="vs Budget%" fill={C.amber} radius={[3,3,0,0]} barSize={14} opacity={0.8}/>
+              <Bar dataKey="vs LY%" fill={C.cyan} radius={[3,3,0,0]} barSize={14} opacity={0.6}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </>)}
+
+      {/* ===== VARIANCE ===== */}
+      {tab==='variance'&&(<>
+        <Sec icon="📉">GOR Variance by Hotel (百万円)</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={520}>
+            <BarChart data={[...hotels].sort((a,b)=>(b.fg-b.pg)-(a.fg-a.pg)).map(h=>({
+              h:h.h,'vs Prev FC':(h.fg-h.pg)/M,'vs Budget':(h.fg-h.bg)/M,'vs LY':(h.fg-h.lg)/M
+            }))} layout="vertical" margin={{left:8,right:20,top:8,bottom:8}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false}/>
+              <XAxis type="number" tickFormatter={v=>`${v.toFixed(0)}M`} tick={{fill:C.t3,fontSize:10}}/>
+              <YAxis dataKey="h" type="category" width={36} tick={{fill:C.t2,fontSize:10,fontWeight:700}}/>
+              <Tooltip formatter={v=>`¥${v.toFixed(0)}M`} contentStyle={{background:'#1e293b',border:'1px solid #334155',borderRadius:8,fontSize:11}}/>
+              <Legend wrapperStyle={{fontSize:10}}/>
+              <ReferenceLine x={0} stroke={C.t3}/>
+              <Bar dataKey="vs Prev FC" fill={C.prevFC} barSize={8} radius={[0,3,3,0]}/>
+              <Bar dataKey="vs Budget" fill={C.amber} barSize={8} radius={[0,3,3,0]} opacity={0.7}/>
+              <Bar dataKey="vs LY" fill={C.cyan} barSize={8} radius={[0,3,3,0]} opacity={0.5}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <Sec icon="💹">GOP Variance by Hotel (百万円)</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={520}>
+            <BarChart data={[...hotels].sort((a,b)=>(b.fp-b.pp)-(a.fp-a.pp)).map(h=>({
+              h:h.h,'vs Prev FC':(h.fp-h.pp)/M,'vs Budget':(h.fp-h.bp)/M,'vs LY':(h.fp-h.lp)/M
+            }))} layout="vertical" margin={{left:8,right:20,top:8,bottom:8}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false}/>
+              <XAxis type="number" tickFormatter={v=>`${v.toFixed(0)}M`} tick={{fill:C.t3,fontSize:10}}/>
+              <YAxis dataKey="h" type="category" width={36} tick={{fill:C.t2,fontSize:10,fontWeight:700}}/>
+              <Tooltip formatter={v=>`¥${v.toFixed(0)}M`} contentStyle={{background:'#1e293b',border:'1px solid #334155',borderRadius:8,fontSize:11}}/>
+              <Legend wrapperStyle={{fontSize:10}}/>
+              <ReferenceLine x={0} stroke={C.t3}/>
+              <Bar dataKey="vs Prev FC" fill={C.prevFC} barSize={8} radius={[0,3,3,0]}/>
+              <Bar dataKey="vs Budget" fill={C.amber} barSize={8} radius={[0,3,3,0]} opacity={0.7}/>
+              <Bar dataKey="vs LY" fill={C.purple} barSize={8} radius={[0,3,3,0]} opacity={0.5}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </>)}
+
+      {/* ===== KPI ===== */}
+      {tab==='kpi'&&(<>
+        <Sec icon="🎯">RevPAR Ranking — FC vs Prev FC vs Budget vs LY</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={520}>
+            <BarChart data={[...hotels].sort((a,b)=>b.rp-a.rp).map(h=>({
+              h:h.h,FC:h.rp,'Prev FC':h.prp,Budget:h.brp,LY:h.lrp
+            }))} layout="vertical" margin={{left:8,right:20,top:8,bottom:8}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false}/>
+              <XAxis type="number" tickFormatter={v=>fK(v)} tick={{fill:C.t3,fontSize:10}}/>
+              <YAxis dataKey="h" type="category" width={36} tick={{fill:C.t2,fontSize:10,fontWeight:700}}/>
+              <Tooltip formatter={v=>`¥${v.toLocaleString()}`} contentStyle={{background:'#1e293b',border:'1px solid #334155',borderRadius:8,fontSize:11}}/>
+              <Legend wrapperStyle={{fontSize:10}}/>
+              <Bar dataKey="FC" fill={C.accent} radius={[0,3,3,0]} barSize={8}/>
+              <Bar dataKey="Prev FC" fill={C.prevFC} radius={[0,3,3,0]} barSize={8} opacity={0.7}/>
+              <Bar dataKey="Budget" fill={C.amber} radius={[0,3,3,0]} barSize={8} opacity={0.5}/>
+              <Bar dataKey="LY" fill={C.t3} radius={[0,3,3,0]} barSize={8} opacity={0.35}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <Sec icon="📊">ADR Ranking — FC vs Prev FC vs Budget vs LY</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={520}>
+            <BarChart data={[...hotels].sort((a,b)=>b.ad-a.ad).map(h=>({
+              h:h.h,FC:h.ad,'Prev FC':h.pad,Budget:h.bad,LY:h.lad
+            }))} layout="vertical" margin={{left:8,right:20,top:8,bottom:8}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false}/>
+              <XAxis type="number" tickFormatter={v=>fK(v)} tick={{fill:C.t3,fontSize:10}}/>
+              <YAxis dataKey="h" type="category" width={36} tick={{fill:C.t2,fontSize:10,fontWeight:700}}/>
+              <Tooltip formatter={v=>`¥${v.toLocaleString()}`} contentStyle={{background:'#1e293b',border:'1px solid #334155',borderRadius:8,fontSize:11}}/>
+              <Legend wrapperStyle={{fontSize:10}}/>
+              <Bar dataKey="FC" fill={C.accent} radius={[0,3,3,0]} barSize={8}/>
+              <Bar dataKey="Prev FC" fill={C.prevFC} radius={[0,3,3,0]} barSize={8} opacity={0.7}/>
+              <Bar dataKey="Budget" fill={C.amber} radius={[0,3,3,0]} barSize={8} opacity={0.5}/>
+              <Bar dataKey="LY" fill={C.t3} radius={[0,3,3,0]} barSize={8} opacity={0.35}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <Sec icon="🛏">Occupancy Ranking — FC vs Prev FC vs Budget vs LY</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:18}}>
+          <ResponsiveContainer width="100%" height={520}>
+            <BarChart data={[...hotels].sort((a,b)=>b.oc-a.oc).map(h=>({
+              h:h.h,FC:h.oc,'Prev FC':h.poc,Budget:h.boc,LY:h.loc
+            }))} layout="vertical" margin={{left:8,right:20,top:8,bottom:8}}>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false}/>
+              <XAxis type="number" domain={[60,100]} tickFormatter={v=>`${v}%`} tick={{fill:C.t3,fontSize:10}}/>
+              <YAxis dataKey="h" type="category" width={36} tick={{fill:C.t2,fontSize:10,fontWeight:700}}/>
+              <Tooltip formatter={v=>`${v.toFixed(1)}%`} contentStyle={{background:'#1e293b',border:'1px solid #334155',borderRadius:8,fontSize:11}}/>
+              <Legend wrapperStyle={{fontSize:10}}/>
+              <Bar dataKey="FC" fill={C.accent} radius={[0,3,3,0]} barSize={8}/>
+              <Bar dataKey="Prev FC" fill={C.prevFC} radius={[0,3,3,0]} barSize={8} opacity={0.7}/>
+              <Bar dataKey="Budget" fill={C.amber} radius={[0,3,3,0]} barSize={8} opacity={0.5}/>
+              <Bar dataKey="LY" fill={C.t3} radius={[0,3,3,0]} barSize={8} opacity={0.35}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </>)}
+
+      {/* ===== TABLE ===== */}
+      {tab==='table'&&(<>
+        <Sec icon="📋">Full Detail Table — All Comparisons</Sec>
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,overflow:'auto'}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:11,minWidth:1200}}>
+            <thead><tr style={{background:'#0f172a'}}>
+              <ThC k="h" left>Hotel</ThC>
+              <ThC k="fg">FC GOR</ThC>
+              <ThC k="fp">FC GOP</ThC>
+              <ThC k="gm">GOP%</ThC>
+              <ThC k="oc">OCC</ThC>
+              <ThC k="ad">ADR</ThC>
+              <ThC k="rp">RevPAR</ThC>
+              <th style={{padding:'9px 6px',textAlign:'center',fontSize:9,fontWeight:700,color:C.prevFC,borderBottom:`1px solid ${C.border}`,letterSpacing:0.5}} colSpan={2}>vs PREV FC</th>
+              <th style={{padding:'9px 6px',textAlign:'center',fontSize:9,fontWeight:700,color:C.amber,borderBottom:`1px solid ${C.border}`,letterSpacing:0.5}} colSpan={2}>vs BUDGET</th>
+              <th style={{padding:'9px 6px',textAlign:'center',fontSize:9,fontWeight:700,color:C.cyan,borderBottom:`1px solid ${C.border}`,letterSpacing:0.5}} colSpan={2}>vs LY</th>
+            </tr>
+            <tr style={{background:'#0f172a'}}>
+              <th style={{borderBottom:`1px solid ${C.border}`,position:'sticky',left:0,background:'#0f172a',zIndex:2}}/>
+              {['','','','','',''].map((_,i)=><th key={i} style={{borderBottom:`1px solid ${C.border}`}}/>)}
+              {['GOR','GOP','GOR','GOP','GOR','GOP'].map((v,i)=>(
+                <th key={`sub${i}`} style={{padding:'4px 8px',textAlign:'right',fontSize:8,fontWeight:600,
+                  color:i<2?C.prevFC:i<4?C.amber:C.cyan,borderBottom:`1px solid ${C.border}`,letterSpacing:0.5}}>{v}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {sortedH.map((h,i)=>(
+                <tr key={h.h} style={{background:i%2===0?'transparent':'rgba(255,255,255,0.015)',borderBottom:`1px solid ${C.border}`}}>
+                  <td style={{padding:'8px 10px',fontWeight:700,color:C.t1,position:'sticky',left:0,background:i%2===0?C.card:'#131c2e',zIndex:1}}>{h.h}</td>
+                  <td style={{padding:'8px 10px',textAlign:'right',fontFamily:'monospace',color:C.t1}}>{fB(h.fg)}</td>
+                  <td style={{padding:'8px 10px',textAlign:'right',fontFamily:'monospace',color:C.t1}}>{fB(h.fp)}</td>
+                  <td style={{padding:'8px 10px',textAlign:'right',color:h.gm>=pcts.gm?C.green:C.amber,fontWeight:700}}>{h.gm}%</td>
+                  <td style={{padding:'8px 10px',textAlign:'right',color:C.t1}}>{h.oc}%</td>
+                  <td style={{padding:'8px 10px',textAlign:'right',fontFamily:'monospace',color:C.t1}}>¥{h.ad.toLocaleString()}</td>
+                  <td style={{padding:'8px 10px',textAlign:'right',fontFamily:'monospace',color:C.t1}}>¥{h.rp.toLocaleString()}</td>
+                  {pctCell(h.fg,h.pg)}{pctCell(h.fp,h.pp)}
+                  {pctCell(h.fg,h.bg)}{pctCell(h.fp,h.bp)}
+                  {pctCell(h.fg,h.lg)}{pctCell(h.fp,h.lp)}
+                </tr>
+              ))}
+              <tr style={{background:'#0f172a',borderTop:`2px solid ${C.accent}`}}>
+                <td style={{padding:'10px',fontWeight:800,color:C.accent,position:'sticky',left:0,background:'#0f172a',zIndex:1}}>TOTAL</td>
+                <td style={{padding:'10px',textAlign:'right',color:C.accent,fontWeight:700,fontFamily:'monospace'}}>{fB(tot.fg)}</td>
+                <td style={{padding:'10px',textAlign:'right',color:C.green,fontWeight:700,fontFamily:'monospace'}}>{fB(tot.fp)}</td>
+                <td style={{padding:'10px',textAlign:'right',color:C.accent,fontWeight:700}}>{pcts.gm.toFixed(1)}%</td>
+                <td colSpan={3}/>
+                <td style={{padding:'10px',textAlign:'right'}}><Badge val={pcts.vPG}/></td>
+                <td style={{padding:'10px',textAlign:'right'}}><Badge val={pcts.vPP}/></td>
+                <td style={{padding:'10px',textAlign:'right'}}><Badge val={pcts.vBG}/></td>
+                <td style={{padding:'10px',textAlign:'right'}}><Badge val={pcts.vBP}/></td>
+                <td style={{padding:'10px',textAlign:'right'}}><Badge val={pcts.vLG}/></td>
+                <td style={{padding:'10px',textAlign:'right'}}><Badge val={pcts.vLP}/></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </>)}
+
+      <div style={{textAlign:'center',marginTop:36,paddingBottom:16,color:C.t3,fontSize:9}}>
+        FY2026 PL Forecast Dashboard（改）v2 · HMJ Hotel Management Japan · 社外秘 · Generated 2026-02-25
+      </div>
+    </div>
+  );
+}
